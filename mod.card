@@ -1,0 +1,14 @@
+return {
+  summary = "Automated FR/LG egg search with six-perfect IVs, shiny and trait targets.",
+  tags = { "tool", "gen3", "breeding" },
+  differences = {
+    changed = {},
+    added = { "AUTO BREEDER start-menu screen", "Virtual parent improvement", "Native egg generation and explicit party/PC delivery" },
+    known = { "FR/LG 0.3.21 tested", "Search skips walking and hatching time", "Unclaimed searches persist only during the current play session", "Load the game with this mod enabled before GBA export" },
+  },
+  credits = {
+    { who = "BOIS CLUB GAMES, LLC", for_ = "Based on the Pokemon Gen 1 Recompilation Project by BOIS CLUB GAMES, LLC" },
+    { who = "LegalMon", for_ = "UI conventions from the user's existing LegalMon 0.2.1 mod" },
+  },
+  compat = { engine = ">=0.3.21 <0.4.0", modApi = 2 },
+}

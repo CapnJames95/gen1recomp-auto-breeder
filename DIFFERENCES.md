@@ -2,14 +2,8 @@
 
 Search native eggs for IVs, shininess and other traits.
 
-# Auto Breeder
+Supports Ruby, Sapphire, Emerald, FireRed and LeafGreen.
 
-Search native eggs for IVs, shininess and other traits.
+Adds native Ruby/Sapphire Route 117 daycare, egg generation and inheritance. Keeps Emerald-only breeding bonuses restricted to Emerald.
 
-For **Emerald, FireRed and LeafGreen**. Recommend **gen1recomp 0.3.42+**, especially for Sweet Scent.
-
-- Search game-generated eggs for selected IVs, nature, gender, ability or shininess.
-- Parent optimization and native game-specific breeding rules.
-- Supports Emerald, FireRed and LeafGreen.
-
-The repository migration changes only package metadata and documentation; runtime Lua matches collection v1.3.
+See [README](README.md) for features, controls and limitations.

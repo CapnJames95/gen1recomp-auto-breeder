@@ -42,8 +42,9 @@ function Export.install()
   local Codec = require("src.save_convert.Gen3Save")
   local Layout = require("src.save_convert.Gen3Layout")
   installCodec(Codec, Layout)
-  if require("src.core.GameVersion").get()=="emerald" and Codec.forVersion then
-    installCodec(Codec.forVersion("emerald"), Layout)
+  local version=require("src.core.GameVersion").get()
+  if (version=="emerald" or version=="ruby" or version=="sapphire") and Codec.forVersion then
+    installCodec(Codec.forVersion(version), Layout)
   end
 end
 return Export

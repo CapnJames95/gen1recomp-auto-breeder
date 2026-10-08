@@ -92,7 +92,7 @@ return function(Breeder, View, services)
         { label = function() return "Parent 2: " .. monName(screen.parents[2]) end, action = function() selectParent(2) end },
         { label = "Use both Day Care parents", action = function()
           local dc = Daycare.stateOf(session)
-          if not Daycare.mon(dc, 1) or not Daycare.mon(dc, 2) then info("DAY CARE", { session.version == "emerald" and "Deposit two parents on Route 117." or "Deposit two parents at Four Island." }); return end
+          if not Daycare.mon(dc, 1) or not Daycare.mon(dc, 2) then info("DAY CARE", { (session.version == "emerald" or session.version == "ruby" or session.version == "sapphire") and "Deposit two parents on Route 117." or "Deposit two parents at Four Island." }); return end
           screen.parents = { Breeder.copy(Daycare.mon(dc, 1)), Breeder.copy(Daycare.mon(dc, 2)) }
           screen.sources = { "daycare1", "daycare2" }
         end },

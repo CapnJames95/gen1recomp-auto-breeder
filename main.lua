@@ -30,7 +30,7 @@ return function(mod)
     local result = next(game, items)
     if type(result) ~= "table" then return result end
     local session = Runtime.getSession()
-    if not session or (session.version ~= "firered" and session.version ~= "leafgreen" and session.version ~= "emerald") then return result end
+    if not session or (session.version ~= "firered" and session.version ~= "leafgreen" and session.version ~= "emerald" and session.version ~= "ruby" and session.version ~= "sapphire") then return result end
     for _, row in ipairs(result) do if row.id == "autobreeder" then return result end end
     local position = #result + 1
     for index, row in ipairs(result) do if row.id == "save" then position = index; break end end

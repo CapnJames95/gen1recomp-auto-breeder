@@ -80,11 +80,20 @@ function Breeder.score(pair, targets, version)
       probability = probability + chance
       return
     end
-    for pick, stat in ipairs(available) do
+    local rs=version=='ruby' or version=='sapphire'
+    local count=rs and (7-depth) or #available
+    for pick=1,count do
+      local stat=available[pick]
       local nextAvailable, nextInherited = Breeder.copy(available), Breeder.copy(inherited)
-      table.remove(nextAvailable, version == "emerald" and depth or pick)
+      if rs then
+        -- Native RS invalidates the slot indexed by the selected STAT and
+        -- compacts the full six-slot buffer, retaining its old tail.
+        nextAvailable[stat]=255
+        local temp=Breeder.copy(nextAvailable);local j=1
+        for k=1,6 do if temp[k]~=255 then nextAvailable[j]=temp[k];j=j+1 end end
+      else table.remove(nextAvailable, version == "emerald" and depth or pick) end
       nextInherited[stat] = true
-      visit(nextAvailable, nextInherited, depth + 1, weight / #available)
+      visit(nextAvailable, nextInherited, depth + 1, weight / count)
     end
   end
   visit({1, 2, 3, 4, 5, 6}, {}, 1, 1)
@@ -124,7 +133,7 @@ function Breeder.validate(pair, target)
 end
 
 function Breeder.start(session, pair, target)
-  if session.version ~= "firered" and session.version ~= "leafgreen" and session.version ~= "emerald" then return nil, "FireRed / LeafGreen / Emerald only." end
+  if session.version ~= "firered" and session.version ~= "leafgreen" and session.version ~= "emerald" and session.version ~= "ruby" and session.version ~= "sapphire" then return nil, "A supported Gen 3 game is required." end
   local ok, message = Breeder.validate(pair, target)
   if not ok then return nil, message end
   local scratch = { version = session.version, party = {}, map = session.map, name = session.name,
@@ -151,7 +160,10 @@ end
 
 function Breeder.generate(job)
   local dc = { job.parents[1], job.parents[2] }
-  if job.scratch.version == "emerald" then
+  local policy=require("src.core.game3.profile").forSession(job.scratch).daycare
+  if policy and policy.pendingPersonality then
+    dc.offspringPersonality=policy.pendingPersonality(job.scratch,dc)
+  elseif job.scratch.version == "emerald" then
     dc.offspringPersonality = Breeding.rsePersonality(job.scratch, dc)
   else
     dc.offspringPersonality = (Rng.Random() % 0xFFFE) + 1
@@ -163,6 +175,8 @@ function Breeder.generate(job)
   Breeding.buildEggMoveset(egg, dc[father], dc[mother])
   if job.scratch.version == "emerald" then
     if Pokemon.national(species) == 172 then Breeding.giveVoltTackleIfLightBall(job.scratch, egg, dc) end
+  end
+  if Breeding.isRse(job.scratch) then
     egg.metLocation = 0 -- Unhatched RSE eggs use the RSE egg location.
   else
     egg.metLocation = 146
@@ -223,6 +237,7 @@ function Breeder.step(job, count, clock, budget)
 end
 
 function Breeder.keepParent(job, session, slot, isActive)
+  if session and (session.version=='ruby' or session.version=='sapphire') and tostring(require('src.core.game3.map').current or session.map):find('BATTLE_TOWER',1,true) then return false,'Leave the Battle Tower before receiving Pokemon.' end
   if session and session.version=="emerald" and session.frontier and (session.frontier.challengeStatus or 0)~=0 then return false,"Finish the Battle Frontier challenge before receiving Pokemon." end
   if session ~= job.session or (isActive and not isActive(session)) then return false, "The playthrough has changed." end
   local parent = job.parents[slot]
@@ -244,6 +259,7 @@ function Breeder.keepParent(job, session, slot, isActive)
 end
 
 function Breeder.keep(job, session, hatch, isActive)
+  if session and (session.version=='ruby' or session.version=='sapphire') and tostring(require('src.core.game3.map').current or session.map):find('BATTLE_TOWER',1,true) then return false,'Leave the Battle Tower before receiving Pokemon.' end
   if session and session.version=="emerald" and session.frontier and (session.frontier.challengeStatus or 0)~=0 then return false,"Finish the Battle Frontier challenge before receiving Pokemon." end
   if session ~= job.session or (isActive and not isActive(session)) then return false, "The playthrough has changed." end
   if job.status ~= "found" or not job.result then return false, "No unclaimed match." end

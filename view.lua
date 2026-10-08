@@ -1,3 +1,9 @@
+-- RS native small-font atlases do not render reliably in these compact mod menus.
+-- Keep measurement and drawing on the same readable native face.
+local function collectionFont()
+ local v=require('src.core.GameVersion').get()
+ return (v=='ruby' or v=='sapphire') and 'normal' or nil
+end
 local View = {}
 local Window = require("src.ui.game3.window")
 local Font = require("src.ui.game3.frlg_font")
@@ -5,18 +11,18 @@ local Pokemon = require("src.core.game3.pokemon")
 
 local function text(value, left, top, width, small, colors)
   value = tostring(value or "")
-  if Font.measure(value, { small = small }) > width then
-    while #value > 0 and Font.measure(value .. "...", { small = small }) > width do value = value:sub(1, -2) end
+  if Font.measure(value, {small=collectionFont()==nil and small }) > width then
+    while #value > 0 and Font.measure(value .. "...", {small=collectionFont()==nil and small }) > width do value = value:sub(1, -2) end
     value = value .. "..."
   end
-  Window.printPx(value, left, top, { maxWidth = width, small = small, colors = colors })
+  Window.printPx(value, left, top, { maxWidth = width,small=collectionFont()==nil and small, colors = colors })
 end
 
 function View.wrap(value, width)
   local rows, line = {}, ""
   for word in tostring(value):gmatch("%S+") do
     local trial = line == "" and word or line .. " " .. word
-    if Font.measure(trial, { small = true }) > width and line ~= "" then rows[#rows + 1], line = line, word
+    if Font.measure(trial, {small=collectionFont()==nil and true }) > width and line ~= "" then rows[#rows + 1], line = line, word
     else line = trial end
   end
   if line ~= "" then rows[#rows + 1] = line end
@@ -37,7 +43,7 @@ function View.draw(screen, Breeder)
   love.graphics.rectangle("fill", 0, 0, 240, 16)
   love.graphics.setColor(1, 1, 1, 1)
   text(page.title, 8, 0, 190, false, Font.COLOR.WHITE)
-  text(#page.rows > 6 and (page.cursor .. "/" .. #page.rows) or screen.session.version == "emerald" and "EM" or screen.session.version == "leafgreen" and "LG" or "FR", 202, 0, 31, true, Font.COLOR.WHITE)
+  text(#page.rows > 6 and (page.cursor .. "/" .. #page.rows) or screen.session.version == "ruby" and "RU" or screen.session.version == "sapphire" and "SA" or screen.session.version == "emerald" and "EM" or screen.session.version == "leafgreen" and "LG" or "FR", 202, 0, 31, true, Font.COLOR.WHITE)
   local help = "A: choose  B/L: back  Left/Right: page"
   if page.kind == "progress" then
     frame(1, 3, 28, 13)
